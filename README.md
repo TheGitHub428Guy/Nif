@@ -14,8 +14,9 @@ Yep, here they are:
 |i/o|`;`|Pops¹ a number N, then outputs it³ if N≥0. Otherwise, gets a number from input³ and pushes it to the stack.|
 |while|`[`|Pops¹ a number N, then jumps to the matching ] if N≤0.|
 |end|`]`|Pops¹ a number N, then jumps back to the matching [ if N>0.|
-¹If a command tries to pop from an empty stack, or if ~ tries to bring from below the bottom of the stack (for example, using `&~`), it gets a 0.
-²If ~ tries to bury a number past the bottom of the stack, the number gets discarded instead.
+
+¹If a command tries to pop from an empty stack, or if ~ tries to bring from below the bottom of the stack (for example, using `&~`), it gets a 0.\
+²If ~ tries to bury a number past the bottom of the stack, the number gets discarded instead.\
 ³Usually text I/O, but you could have a method for using different methods of I/O (for example, different negative values of N for different input methods)
 
 All other characters are NOPs and can be used as comments (or decoration!).
