@@ -58,7 +58,8 @@ def nifInput(multi=False):
         i = (yield) if multi else 0 #???
         if i not in inp: inp[i] = []
         if len(inp[i]) == 0:
-            text = input()
+            try: text = input()
+            except EOFError: text = ""
             for t in text:
                 inp[i] += [ord(t)]
         yield (inp[i].pop(0) if len(inp[i]) > 0 else 0) #nice

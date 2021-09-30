@@ -1,5 +1,5 @@
 #This can be used to convert Brain[frick] programs into Nif.
-#This is only to prove Turing-Completeness. Do not use this.
+#This is only to prove Turing-Completeness and is very inefficient.
 a = input()
 s = ""
 sub = {
