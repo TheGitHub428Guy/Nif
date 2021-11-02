@@ -1,0 +1,301 @@
+<!DOCTYPE html-5>
+<html>
+	<head>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script><!-- thank you jquery -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.0/split.min.js"></script><!-- thank you person from stackoverflow -->
+		<style>
+			html {overflow: hidden}
+			body {background-color: 0; margin:0}
+			*{font-family: monospace}
+			textarea {
+				color: white;
+				background-color: #222;
+				border-color: #444;
+				resize: none;
+				width:100%
+			}
+			div{color:white}
+			#a11>*{height:100%}
+			#e{background-color: 0a75; border-color: 2a2abc;}
+			#r{background-color: 053b; border-color: 151565; white-space: pre-wrap}
+			#s{background-color:#333; height:100%}
+			#a1{height: calc(100% - 100px)}
+			/*help?*/
+			#a2{background-color:#555; height:120px; bottom:0; width:100%; font-size:0 /*remove space between buttons*/;position:relative}
+			#b{background-color:#222}
+			.gutter {background-color: #000; z-index: 2}
+			#o,#s{white-space: pre-wrap; overflow-y: scroll}
+			#loading{position:fixed;width:100%;height:100%;background-color:black;z-index:60;font-size:60px;padding:20%}
+			#all{height:100%}
+			/*help? anyone help*/
+			#a2>button{width:33%; height:60px; font-size:40px}
+			#speed{width:100%; margin:0}
+			#a2>*{font-size:20px}
+			#speedText{font-size:20px}
+			markb{background-color:#00f}
+			#rightside{display:inline; right:0;position:absolute}
+		</style>
+		<script>
+			//shorthand variables
+			U = 0[0];
+			T = !0;
+			F = !1;
+			Array.prototype.$ = Array.prototype.shift;
+			Array.prototype._ = Array.prototype.unshift;
+			$cnsl = console.log;
+			class Nif {
+				//i coded the original interpreter in python. cool!
+				constructor (c, io) {
+					//io should be an object with a method called _
+					//which takes 1 argument (a number) and returns a number
+					this.c=c; //code
+					this.p=0; //instecjron pointer
+					this.s=[];//stack
+					this.io=io??{"_":(a)=>{return 0}}; //input & output method (if none found, uses a placeholder)
+					this.d=0; //ip direction; 0=normal, >0=skipping past loop, <0=backtracking in loop
+				}
+				mov (a,b){
+					let x=this.s.splice(a,1)[0]??0;
+					if(b<=this.s.length){this.s.splice(b,0,x)}
+				}
+				step () {
+					if (this.d!=0) {
+						switch(this.c[this.p]){
+							case U: //past end of code or before beginning of code, can only be caused by unmatching brackets
+								return(2);
+								break;
+							case"[":this.d++;break;
+							case"]":this.d--;break;
+						}
+					} else {
+						let x=0; //let me declare variables in case statementns please
+						let y=0; //a
+						switch(this.c[this.p]){
+							case U: //past end of code, program finished
+								return(1);
+								break;
+							case"&":
+								this.s._(this.s.length);
+								break;
+							case"-":
+								this.s._(-(this.s.$()??0)+(this.s.$()??0));
+								break;
+							case"~":
+								{x=this.s.$()??0;
+								if(x==0){this.s._(this.s[0]??0)}
+								else{this.mov(Math.max(0,x), Math.max(0,-x))};
+								break;}
+							case";":
+								this.s._(this.io._(this.s.$()??0));
+								break;
+							case"[":
+								if(this.s.$()<1){this.d++};
+								break;
+							case"]":
+								if(this.s.$()>0){this.d--};
+								break;
+						}
+					}
+					this.p+=(this.d<0)?-1:1; //nice!
+					return(0)
+				}
+			}
+			//can i have class for input and output?
+			class NullIO { //for input and output?
+				//yes
+				constructor(){
+					//...
+				}
+				_(n){return(0);} //actually does nothing like a boss
+			}
+			class NifIO {
+				//Combines multiple methods of IO.
+				constructor(m){
+					//m should be an object of valid IO methods
+					//in the format {non-zero number: method}
+					this.m=m;
+					this.c=1; //current IO mode (starts at 1)
+					this.s=F; //s: whether NifIO is in switching mode
+				}
+				_(n){
+					if (this.s) {
+						if(n==0){return(this.m[this.c]._(0)??0)}
+						else{this.c=n;if(this.m[this.c]==U){this.m[this.c]=new NullIO()}};this.s=F
+					} else {
+						if(n==0){this.s=T;}
+						else{return(this.m[this.c]._(n)??0)}
+					}
+					return(0)
+				}
+			}
+			class TextIO {
+				constructor(i,o) {
+					this.i=$(i);
+					this.o=$(o);
+				}
+				_(n){
+					if(n<0){
+						//if(!(this.in.length)){
+							//this.in=this.in.concat(...("input here\n".split("").map((a)=>a.charCodeAt(0))))
+							return([
+								this.i.val().length?this.i.val().charCodeAt(0):0,
+								this.i.val(this.i.val().substr(1))
+							][0]) //i'm good at coding shut up /j
+						//}
+						
+					}else{
+						//console.log(String.fromCharCode(n))
+						this.o.html(
+							this.o.html()
+							+this.o.text(String.fromCharCode(n)).html()
+						);
+						return(0)
+					}
+					return(0)
+				}
+			}
+			$(function(){
+				$cnsl("loaded");
+				playing = 0;
+				nif = U;
+				steps = 0;
+				//0 = stopped, 1 = playing, -1 = paused
+				step = ()=>{
+					keepGoing=1;
+					if (nif==U) {
+						steps = 0;
+						nif=new Nif($("#e").val(), new NifIO({1: new TextIO("#i", "#o")}));
+						$("#o").html(
+							$("#o").html()
+							+"<br><mark>===PROGRAM START===</mark><br>"
+						);
+					}else{
+						stepsLeft = Math.min(+($("#spf").val()), +($("#spf").attr("max")))
+						while (stepsLeft > 0) {
+							do { //an actually useful do...while loop? wild
+								x=nif.step();
+								steps++;
+							} while ((!($("#skipToggle").is(":checked")) && nif.d) || nif.c[nif.p] == "\n");
+							stepsLeft--;
+						}
+						if(x) {
+							keepGoing=0;
+							$("#step,#play").attr("disabled", T);
+							$("#play").text("Play");
+							$("#o").html(
+								$("#o").html()
+								+"<br><markb>====PROGRAM END====</markb><br>"
+							);
+						}
+					};
+					$("#r").html(
+						$("#r").text($("#e").val().substr(0,nif.p)).html()
+						+ ["<markb>","<mark>"][+(!nif.d)]
+						+ $("#r").text($("#e").val().substr(nif.p,1)).html()
+						+ ["</markb>","</mark>"][+(!nif.d)]
+						+ $("#r").text($("#e").val().substr(nif.p+1)).html() //this feels unnecessary...
+					);
+					$("#s").html(
+						$("#s").text("Stack: " + [...nif.s].reverse().join(" ") + "\n(length: " + nif.s.length + ")").html() //ok but why
+						+$("#s").text("\nPointer direction: " + ((nif.d)?(((nif.d>0)?"Skipping":"Backtracking") + ` (${Math.abs(nif.d)})`):"Normal")).html() //oh dear
+					);
+					$("#r").show();
+					$("#e").hide();
+					return(keepGoing);
+				};
+				playLoop = ()=>{
+					if (step()){
+						playF = setTimeout(playLoop, $("#speed").val());
+					}
+				};
+				$("#play").on("click", ()=>{
+					if(playing>0){
+						clearTimeout(playF);
+						$("#stop,#step").attr("disabled", F); //nice
+						$("#play").text("Play");
+						playing=-1;
+					}else{
+						playF = setTimeout(playLoop, $("#speed").val());
+						$("#stop").attr("disabled", F);
+						$("#step").attr("disabled", T);
+						$("#play").text("Pause");
+						playing=1;
+					};
+				})
+				$("#step").on("click", ()=>{
+					/*if (!playing) {
+						$("#r").show();
+						$("#e").hide();
+					}*/
+					step();
+					$("#stop").attr("disabled", F);
+					playing = -1;
+					/*if(!playing){
+					};
+					nif.step();
+					console.log(nif.s, nif.p, nif.d);
+					console.log(" ".repeat(12)+"v"+" ".repeat(12)+"\n"+(" ".repeat(25)+nif.c).substr(nif.p+13,25))
+					$("s")*/
+				});
+				$("#stop").on("click", ()=>{
+					$("#r").hide();
+					$("#e").show();
+					if (playing>0) {
+						clearTimeout(playF);
+						$("#play").text("Play");
+					};
+					$("#step,#play").attr("disabled", F);
+					$("#stop").attr("disabled", T);
+					nif = U;
+					playing = 0;
+				});
+				Split(["#a","#b"], {gutterSize: 5});
+				Split(["#a11","#s"], {gutterSize: 5, direction:"vertical", minSize:10, snapOffset:10, sizes:[80,20]});
+				Split(["#o","#i"], {gutterSize: 5, direction:"vertical", minSize:10, snapOffset:10, sizes:[80,20]});
+				$("#speed").on("input", ()=>{$("#speedText").text(`Delay: ${$("#speed").val()}ms`)}) //oooooh
+				$("#loading").hide()
+			});
+		</script>
+	</head>
+	<body>
+		<div id="loading">loading lol</div>
+		<div id="all" style="display:flex">
+		<div id="a">
+			<div id="a1">
+				<div id="a11">
+					<!-- code being edited --><textarea id="e">
+&
+&&--&&--&&--&&--&&--&&--&&--
+&~~&~&&-~--&~~&~~&~&&-~-&&-~--&~&
+[&&--&~~&&&&---~&~~
+[&&-~&~~&~&&--&&--~&~&&---&~~]
+&~&~&&--&&--&&--&&--&-~[&~]&~~
+[;~][&~]
+&~&&--&&--&&--&&--&&--&~~&~&&-~--;[]
+&&-~&]</textarea>
+					<!-- code being run --><div id="r" style="display:none"></div>
+				</div>
+				<!-- program state --><div id="s">Debug info goes here...</div>
+			</div>
+			<div id="a2">
+				<label id="speedText" for="speed">Delay: 100ms</label>
+				<div id="rightside">
+					<label for="st">Show skips:</label>
+					<input type="checkbox" id="skipToggle" name="st">
+					<label for="spf">Steps per frame:</label>
+					<input type="number" id="spf" name="spf" min="1" max="100" value="1">
+				</div>
+				<input type="range" min="0" max="1000" value="100" id="speed" name="speed">
+				<br>
+				<button id="play">Play</button>
+				<button id="step">Step</button>
+				<button id="stop" disabled>Stop</button>
+			</div>
+		</div>
+		<div id="b">
+			<!-- output --><div id="o"></div>
+			<textarea id="i" placeholder="Type input here..."></textarea>
+		</div>
+		</div>
+	</body>
+</html>

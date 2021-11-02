@@ -1,5 +1,5 @@
 #This can be used to convert Brain[frick] programs into Nif.
-#This is only to prove Turing-Completeness and is very inefficient.
+#This is only to prove Turing-Completeness. It's very inefficient
 a = input()
 s = ""
 sub = {
@@ -8,7 +8,7 @@ sub = {
     "-": ("\nbf_dec*  &~", "&&--",                                                  "-&~~&~&&-~-[&&-~&~~&&&&---~&~&&-~--&~~&~&&-~-]"),
     "<": ("",              "\nbf_left  &~&&--&&--&-~&&-~&~~&~&&-~-[&&-~&~&~]",      ""),
     ">": ("",              "\nbf_right &&-~&&~&&---~&~~&~&&-~-[&~&&--&&--&-~&~&~]", ""),
-    ".": ("",              "\nbf_out   &~~;",                                       ""),
+    ".": ("",              "\nbf_out   &~~;[]",                                     ""),
     ",": ("",              "\nbf_in    [&~]&&-;", "&~~&~&&--&&--~&~~&&&&&&-----~-&&--[&&-~&~~&&&&---~-&~~&~&&--&&--~&~~&&&&&&-----~-&&--]&~~&~&&-~-[&&-~&~~&&&&---~&~&&-~--&~~&~&&-~-]"),
     "[": ("",              "\nbf_while &~~[",                                       ""),
     "]": ("",              "\nbf_end   &~~]",                                       ""),

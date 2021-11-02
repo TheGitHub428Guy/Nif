@@ -1,2 +1,2 @@
-Copy input to output. Stops on end of input.
-&&-;&~~[;&&-;&~~]
+Cat program. Stops on end of input.
+&&-;&~~[;[]&&-;&~~]
