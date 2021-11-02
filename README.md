@@ -26,6 +26,7 @@ Here is a list of the current I/O methods:
 |Name|#|Description|
 |-|-|-|
 |Text|1|For console I/O. Sending any N ≥ 0 will convert N to a character, then output it to console. Sending any N < 0 will receive a character from console input, and return its character code.|
+
 That's all for now. Using undefined I/O methods causes undefined behavior I guess idk
 ### Examples
 Various examples can be found if the `examples` folder.
