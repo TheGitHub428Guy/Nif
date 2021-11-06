@@ -17,14 +17,14 @@
 			div{color:white}
 			#a11>*{height:100%}
 			#e{background-color: 0a75; border-color: 2a2abc;}
-			#r{background-color: 053b; border-color: 151565; white-space: pre-wrap}
+			#r{background-color: 053b; border-color: 151565; white-space: pre-wrap; overflow: auto}
 			#s{background-color:#333; height:100%}
 			#a1{height: calc(100% - 100px)}
 			/*help?*/
 			#a2{background-color:#555; height:120px; bottom:0; width:100%; font-size:0 /*remove space between buttons*/;position:relative}
 			#b{background-color:#222}
 			.gutter {background-color: #000; z-index: 2}
-			#o,#s{white-space: pre-wrap; overflow-y: scroll}
+			#o,#s{white-space: pre-wrap; overflow: auto}
 			#loading{position:fixed;width:100%;height:100%;background-color:black;z-index:60;font-size:60px;padding:20%}
 			#all{height:100%}
 			/*help? anyone help*/
@@ -53,6 +53,7 @@
 					this.s=[];//stack
 					this.io=io??{"_":(a)=>{return 0}}; //input & output method (if none found, uses a placeholder)
 					this.d=0; //ip direction; 0=normal, >0=skipping past loop, <0=backtracking in loop
+					this.steps=0; //total steps in the program (without NOPs)
 				}
 				mov (a,b){
 					let x=this.s.splice(a,1)[0]??0;
@@ -76,23 +77,29 @@
 								break;
 							case"&":
 								this.s._(this.s.length);
+								this.steps++;
 								break;
 							case"-":
 								this.s._(-(this.s.$()??0)+(this.s.$()??0));
+								this.steps++;
 								break;
 							case"~":
 								{x=this.s.$()??0;
 								if(x==0){this.s._(this.s[0]??0)}
 								else{this.mov(Math.max(0,x), Math.max(0,-x))};
+								this.steps++;
 								break;}
 							case";":
 								this.s._(this.io._(this.s.$()??0));
+								this.steps++;
 								break;
 							case"[":
 								if(this.s.$()<1){this.d++};
+								this.steps++;
 								break;
 							case"]":
 								if(this.s.$()>0){this.d--};
+								this.steps++;
 								break;
 						}
 					}
@@ -158,12 +165,10 @@
 				$cnsl("loaded");
 				playing = 0;
 				nif = U;
-				steps = 0;
 				//0 = stopped, 1 = playing, -1 = paused
 				step = ()=>{
 					keepGoing=1;
 					if (nif==U) {
-						steps = 0;
 						nif=new Nif($("#e").val(), new NifIO({1: new TextIO("#i", "#o")}));
 						$("#o").html(
 							$("#o").html()
@@ -174,7 +179,6 @@
 						while (stepsLeft > 0) {
 							do { //an actually useful do...while loop? wild
 								x=nif.step();
-								steps++;
 							} while ((!($("#skipToggle").is(":checked")) && nif.d) || nif.c[nif.p] == "\n");
 							stepsLeft--;
 						}
@@ -198,6 +202,7 @@
 					$("#s").html(
 						$("#s").text("Stack: " + [...nif.s].reverse().join(" ") + "\n(length: " + nif.s.length + ")").html() //ok but why
 						+$("#s").text("\nPointer direction: " + ((nif.d)?(((nif.d>0)?"Skipping":"Backtracking") + ` (${Math.abs(nif.d)})`):"Normal")).html() //oh dear
+						+$("#s").text("\nSteps: " + nif.steps).html()
 					);
 					$("#r").show();
 					$("#e").hide();
@@ -283,7 +288,7 @@
 					<label for="st">Show skips:</label>
 					<input type="checkbox" id="skipToggle" name="st">
 					<label for="spf">Steps per frame:</label>
-					<input type="number" id="spf" name="spf" min="1" max="100" value="1">
+					<input type="number" id="spf" name="spf" min="1" max="10000" value="1">
 				</div>
 				<input type="range" min="0" max="1000" value="100" id="speed" name="speed">
 				<br>
