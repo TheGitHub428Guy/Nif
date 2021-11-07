@@ -43,6 +43,7 @@
 			Array.prototype.$ = Array.prototype.shift;
 			Array.prototype._ = Array.prototype.unshift;
 			$cnsl = console.log;
+			max=(...x)=>{return x.sort((a,b)=>(a<b)?1:((a>b)?-1:0))[0]};
 			class Nif {
 				//i coded the original interpreter in python. cool!
 				constructor (c, io) {
@@ -51,13 +52,13 @@
 					this.c=c; //code
 					this.p=0; //instecjron pointer
 					this.s=[];//stack
-					this.io=io??{"_":(a)=>{return 0}}; //input & output method (if none found, uses a placeholder)
+					this.io=io??{"_":(a)=>{return 0n}}; //input & output method (if none found, uses a placeholder)
 					this.d=0; //ip direction; 0=normal, >0=skipping past loop, <0=backtracking in loop
 					this.steps=0; //total steps in the program (without NOPs)
 				}
 				mov (a,b){
-					let x=this.s.splice(a,1)[0]??0;
-					if(b<=this.s.length){this.s.splice(b,0,x)}
+					let x=this.s.splice(Number(a),1)[0]??0n;
+					if(b<=this.s.length){this.s.splice(Number(b),0,x)}
 				}
 				step () {
 					if (this.d!=0) {
@@ -76,29 +77,29 @@
 								return(1);
 								break;
 							case"&":
-								this.s._(this.s.length);
+								this.s._(BigInt(this.s.length));
 								this.steps++;
 								break;
 							case"-":
-								this.s._(-(this.s.$()??0)+(this.s.$()??0));
+								this.s._(-(this.s.$()??0n)+(this.s.$()??0n));
 								this.steps++;
 								break;
 							case"~":
-								{x=this.s.$()??0;
-								if(x==0){this.s._(this.s[0]??0)}
-								else{this.mov(Math.max(0,x), Math.max(0,-x))};
+								{x=this.s.$()??0n;
+								if(x==0n){this.s._(this.s[0]??0n)}
+								else{this.mov(max(0n,x), max(0n,-x))};
 								this.steps++;
 								break;}
 							case";":
-								this.s._(this.io._(this.s.$()??0));
+								this.s._(BigInt(this.io._(this.s.$()??0n)));
 								this.steps++;
 								break;
 							case"[":
-								if(this.s.$()<1){this.d++};
+								if(this.s.$()<1n){this.d++};
 								this.steps++;
 								break;
 							case"]":
-								if(this.s.$()>0){this.d--};
+								if(this.s.$()>0n){this.d--};
 								this.steps++;
 								break;
 						}
@@ -113,7 +114,7 @@
 				constructor(){
 					//...
 				}
-				_(n){return(0);} //actually does nothing like a boss
+				_(n){return 0n;} //actually does nothing like a boss
 			}
 			class NifIO {
 				//Combines multiple methods of IO.
@@ -121,18 +122,18 @@
 					//m should be an object of valid IO methods
 					//in the format {non-zero number: method}
 					this.m=m;
-					this.c=1; //current IO mode (starts at 1)
+					this.c=1n; //current IO mode (starts at 1)
 					this.s=F; //s: whether NifIO is in switching mode
 				}
 				_(n){
 					if (this.s) {
-						if(n==0){return(this.m[this.c]._(0)??0)}
+						if(n==0){return(this.m[this.c]._(0n)??0n)}
 						else{this.c=n;if(this.m[this.c]==U){this.m[this.c]=new NullIO()}};this.s=F
 					} else {
 						if(n==0){this.s=T;}
-						else{return(this.m[this.c]._(n)??0)}
+						else{return(this.m[this.c]._(n)??0n)}
 					}
-					return(0)
+					return(0n)
 				}
 			}
 			class TextIO {
@@ -154,7 +155,7 @@
 						//console.log(String.fromCharCode(n))
 						this.o.html(
 							this.o.html()
-							+this.o.text(String.fromCharCode(n)).html()
+							+this.o.text(String.fromCharCode(Number(n))).html()
 						);
 						return(0)
 					}
