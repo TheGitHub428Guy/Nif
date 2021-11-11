@@ -19,7 +19,7 @@
 			#e{background-color: 0a75; border-color: 2a2abc;}
 			#r{background-color: 053b; border-color: 151565; white-space: pre-wrap; overflow: auto}
 			#s{background-color:#333; height:100%}
-			#a1{height: calc(100% - 100px)}
+			#a1{height: calc(100% - 120px)}
 			/*help?*/
 			#a2{background-color:#555; height:120px; bottom:0; width:100%; font-size:0 /*remove space between buttons*/;position:relative}
 			#b{background-color:#222}
@@ -28,12 +28,24 @@
 			#loading{position:fixed;width:100%;height:100%;background-color:black;z-index:60;font-size:60px;padding:20%}
 			#all{height:100%}
 			/*help? anyone help*/
-			#a2>button{width:33%; height:60px; font-size:40px}
+			#a2b>button{width:33%; height:60px; font-size:40px}
 			#speed{width:100%; margin:0}
-			#a2>*{font-size:20px}
 			#speedText{font-size:20px}
+			#a2r>*{font-size:16px}
+			#a2r>input[type="checkbox"i]{margin-right:10px}
+			#a2r>input[type="number"i]{font-size:initial}
 			markb{background-color:#00f}
-			#rightside{display:inline; right:0;position:absolute}
+			#a2r{display:inline; right:0;position:absolute}
+			#a2b{
+				bottom: 0px;
+				position: absolute;
+				width: 100%;
+			}
+			
+			/*when showing stack as string*/
+			low {text-decoration: underline}
+			negative {background-color: red}
+			x20 {color: #bbbbbb}
 		</style>
 		<script>
 			//shorthand variables
@@ -42,18 +54,18 @@
 			F = !1;
 			Array.prototype.$ = Array.prototype.shift;
 			Array.prototype._ = Array.prototype.unshift;
-			$cnsl = console.log;
+			//Math.max doesn't work with BigInts so here's a substitute
 			max=(...x)=>{return x.sort((a,b)=>(a<b)?1:((a>b)?-1:0))[0]};
 			class Nif {
 				//i coded the original interpreter in python. cool!
 				constructor (c, io) {
 					//io should be an object with a method called _
-					//which takes 1 argument (a number) and returns a number
-					this.c=c; //code
+					//which takes 1 argument (a number) and returns a number (while most likely doing i/o in the process)
+					this.c=c??""; //code (uses an empty string if no code found lol)
 					this.p=0; //instecjron pointer
 					this.s=[];//stack
 					this.io=io??{"_":(a)=>{return 0n}}; //input & output method (if none found, uses a placeholder)
-					this.d=0; //ip direction; 0=normal, >0=skipping past loop, <0=backtracking in loop
+					this.d=0; //ip direction; 0=normal, >0=jumping forward, <0=jumping back
 					this.steps=0; //total steps in the program (without NOPs)
 				}
 				mov (a,b){
@@ -104,11 +116,11 @@
 								break;
 						}
 					}
-					this.p+=(this.d<0)?-1:1; //nice!
+					this.p+=(this.d<0)?-1:1; //i like this line
 					return(0)
 				}
 			}
-			//can i have class for input and output?
+			//can i have a class for input and output?
 			class NullIO { //for input and output?
 				//yes
 				constructor(){
@@ -117,18 +129,19 @@
 				_(n){return 0n;} //actually does nothing like a boss
 			}
 			class NifIO {
-				//Combines multiple methods of IO.
+				//Used to combine multiple methods of IO.
 				constructor(m){
 					//m should be an object of valid IO methods
-					//in the format {non-zero number: method}
+					//in the format {non-zero number: method, non-zero number: method, ...}
 					this.m=m;
-					this.c=1n; //current IO mode (starts at 1)
+					this.c=1n; //current IO mode (starts at 1n)
 					this.s=F; //s: whether NifIO is in switching mode
 				}
 				_(n){
-					if (this.s) {
+					if (this.s) { //if about to switch modes, then
 						if(n==0){return(this.m[this.c]._(0n)??0n)}
-						else{this.c=n;if(this.m[this.c]==U){this.m[this.c]=new NullIO()}};this.s=F
+						else{this.c=n;if(this.m[this.c]==U){this.m[this.c]=new NullIO()}};
+						this.s=F; //it looks wrong without the semicolon
 					} else {
 						if(n==0){this.s=T;}
 						else{return(this.m[this.c]._(n)??0n)}
@@ -143,16 +156,11 @@
 				}
 				_(n){
 					if(n<0){
-						//if(!(this.in.length)){
-							//this.in=this.in.concat(...("input here\n".split("").map((a)=>a.charCodeAt(0))))
-							return([
-								this.i.val().length?this.i.val().charCodeAt(0):0,
-								this.i.val(this.i.val().substr(1))
-							][0]) //i'm good at coding shut up /j
-						//}
-						
+						return([
+							this.i.val().length?this.i.val().charCodeAt(0):0,
+							this.i.val(this.i.val().substr(1))
+						][0]) //trust me i know what i'm doing
 					}else{
-						//console.log(String.fromCharCode(n))
 						this.o.html(
 							this.o.html()
 							+this.o.text(String.fromCharCode(Number(n))).html()
@@ -163,10 +171,22 @@
 				}
 			}
 			$(function(){
-				$cnsl("loaded");
+				//console.log("loaded");
 				playing = 0;
-				nif = U;
 				//0 = stopped, 1 = playing, -1 = paused
+				nif = U;
+				stack2String = (a)=>(
+					(a<0)?
+						(`<negative>${stack2String(-a)}<\/negative>`)
+					:(a<0x20)?
+						(`<low>${"0123456789ABCDEF⁰¹²³⁴⁵⁶⁷⁸⁹abcdef"[Number(a)]}<\/low>`)
+					:(a==0x20)?
+						("<x20>∙</x20>")
+					:(a<0x10000)?
+						$("#s").text(String.fromCharCode(Number(a))).html()
+					:
+						"􏿾"
+				)
 				step = ()=>{
 					keepGoing=1;
 					if (nif==U) {
@@ -180,7 +200,12 @@
 						while (stepsLeft > 0) {
 							do { //an actually useful do...while loop? wild
 								x=nif.step();
-							} while ((!($("#skipToggle").is(":checked")) && nif.d) || nif.c[nif.p] == "\n");
+							} while (
+								((!($("#jumpToggle").is(":checked")) && nif.d)
+								|| (!($("#nopToggle").is(":checked")) && !("&-~;[]".includes(nif.c[nif.p])))
+								|| nif.c[nif.p] == "\n")
+								&& nif.c[nif.p] != U
+							);
 							stepsLeft--;
 						}
 						if(x) {
@@ -201,9 +226,12 @@
 						+ $("#r").text($("#e").val().substr(nif.p+1)).html() //this feels unnecessary...
 					);
 					$("#s").html(
-						$("#s").text("Stack: " + [...nif.s].reverse().join(" ") + "\n(length: " + nif.s.length + ")").html() //ok but why
-						+$("#s").text("\nPointer direction: " + ((nif.d)?(((nif.d>0)?"Skipping":"Backtracking") + ` (${Math.abs(nif.d)})`):"Normal")).html() //oh dear
-						+$("#s").text("\nSteps: " + nif.steps).html()
+						$("#s").text("Steps: " + nif.steps).html()
+						+$("#s").text((nif.d)?` (Jumping ${(nif.d>0)?"for":"back"}wards [${Math.abs(nif.d)}])`:"").html() //oh dear
+						+$("#s").text(`\nStack (${nif.s.length}): `).html()
+						+(($("#stringToggle").is(":checked"))?
+							[...nif.s].reverse().map(stack2String).join("")
+							:($("#s").text(`${[...nif.s].reverse().join(" ")}`).html())) //ok but why
 					);
 					$("#r").show();
 					$("#e").hide();
@@ -229,19 +257,9 @@
 					};
 				})
 				$("#step").on("click", ()=>{
-					/*if (!playing) {
-						$("#r").show();
-						$("#e").hide();
-					}*/
 					step();
 					$("#stop").attr("disabled", F);
 					playing = -1;
-					/*if(!playing){
-					};
-					nif.step();
-					console.log(nif.s, nif.p, nif.d);
-					console.log(" ".repeat(12)+"v"+" ".repeat(12)+"\n"+(" ".repeat(25)+nif.c).substr(nif.p+13,25))
-					$("s")*/
 				});
 				$("#stop").on("click", ()=>{
 					$("#r").hide();
@@ -284,18 +302,25 @@
 				<!-- program state --><div id="s">Debug info goes here...</div>
 			</div>
 			<div id="a2">
-				<label id="speedText" for="speed">Delay: 100ms</label>
-				<div id="rightside">
-					<label for="st">Show skips:</label>
-					<input type="checkbox" id="skipToggle" name="st">
-					<label for="spf">Steps per frame:</label>
+				<div id="a2b">
+					<label id="speedText" for="speed">Delay: 100ms</label>
+					<input type="range" min="0" max="1000" value="100" id="speed" name="speed">
+					<br>
+					<button id="play">Play</button>
+					<button id="step">Step</button>
+					<button id="stop" disabled>Stop</button>
+				</div>
+				<div id="a2r">
+					<label for="st">Show stack as string:</label>
+					<input type="checkbox" id="stringToggle" name="st">
+					<br>
+					<label for="jt">Show jumps:</label>
+					<input type="checkbox" id="jumpToggle" name="jt">
+					<label for="nt">NOPs:</label>
+					<input type="checkbox" id="nopToggle" name="nt">
+					<label for="spf">Steps/frame:</label>
 					<input type="number" id="spf" name="spf" min="1" max="10000" value="1">
 				</div>
-				<input type="range" min="0" max="1000" value="100" id="speed" name="speed">
-				<br>
-				<button id="play">Play</button>
-				<button id="step">Step</button>
-				<button id="stop" disabled>Stop</button>
 			</div>
 		</div>
 		<div id="b">

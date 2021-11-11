@@ -1,0 +1,146 @@
+FizzBuzz program.
+Counts from 1 to 100, but:
+  Multiples of 3 are replaced with "Fizz".
+  Multiples of 5 are replaced with "Buzz".
+  Multiples of 15 are replaced with "FizzBuzz".
+Has 1083 commands and finishes after 86587 steps.
+make "B"
+	&
+	&&--&&--&&--&&--&&--
+	&~~&~&&-~-- &&--
+	&~~&~&&-~--&~~&~~&~&&-~-&&-~--
+make "F"
+	&~~
+	&~~&&--&&--&&--&&--&&-~
+make "z"
+	&~~&~&&-~--&-&-&&&---
+	&~~&&&&&&-----~
+make "u"
+	&&&---
+	&~~&&&&&&-----~
+make "i"
+	&&&---&&&---
+	&&-~
+make b=_4 (buzz counter)
+	&~&-&&--&&--
+make f=_2 (fizz counter)
+	&&&&---
+make h=100 (halt counter)
+	&~&&--&&--&&--~
+	&~~ &&&&&&&&-------~
+	&-&&--&&--&&--
+make c=0 (current counter)
+	&~ &&-~
+do: (variable order: zuBiF bfch)
+	&[
+ h__ (zuBiF bfch)
+	 &~&&---
+	 &&&&&&-----~
+ c++ (zuBiF hbfc)
+	 &&--
+	 &&&&&&-----~
+ make n = +? (zuBiF chbf)
+	 & &&-~
+ if ++f: (zuBiF chbnf)
+	 &&-- &~~[
+	  [&~]
+  output "F" (zuBiF chbn)
+	  &~&&--&&--&&--&&--~
+	  &~~;[&~]
+	  &&&&--&&--&&---~
+  output "i" (zuBiF chbn)
+	  &~&&--&&--&&--&&--&&--~
+	  &~~;[&~]
+	  &&&&--&&--&&--&&---~
+  output "zz" (zuBiF chbn)
+	  &&~&&---~
+	  &~~;[&~]&~~;[&~]
+	  &~&&--&&--&-~
+  n = 0, f = _2 (zuBiF chbn)
+	  [&~&~]
+	  &&&&---
+ :end (zuBiF chbnf)
+	 &~]
+	 &&&&---~ &&-~
+ if ++b: (zuBiF chfnb)
+	 &&-- &~~[
+	  [&~]
+  output "B" (zuBiF chfn)
+	  &&~&&--&&--&&---~
+	  &~~;[&~]
+	  &~&&--&&--&&--&&--&-~
+  output "u" (zuBiF chfn)
+	  &&~&&--&&---~
+	  &~~;[&~]
+	  &~&&--&&--&&--&-~
+  output "zz" (zuBiF chfn)
+	  &&~&&---~
+	  &~~;[&~]&~~;[&~]
+	  &~&&--&&--&-~
+  n = 0, b = _4 (zuBiF chfn)
+	  [&~]&~
+	  &&&&--&&--&&---
+ :end (zuBiF chfnb)
+	 &~] &&-~
+ if n: (zuBiF chfbn)
+	 [
+  x = c (zuBiF chfb)
+	  &~&&--&&--&&--~ &~~
+  0=>tens (zuBiF hfbcx)
+	  &~ &&-~
+  a=1 (zuBiF hfbc0x)
+	  &~&&--
+  do: (zuBiF hfbc0xa)
+	  &[
+   a=>tens (zuBiF hfbc(0t*)xa)
+	   &~~&&&&---~
+   a *= 10 (zuBiF hfbc(0t*)xa)
+	   &~~&~&&-~--
+	   &~~
+	   &~~&~&&-~-- &~~&~&&-~--
+	   &~&&-~--
+  :while c_a+1 (zuBiF hfbc(0t*)xa)
+	   &~~ &~&&--&&--~ &~~ &&&&&&-----~
+	  &&-~ - &&--]
+  N = "0" (zuBiF hfbc(0t*)xa)
+	  &~&&--&&--&&--
+	  &~~&~&&-~--
+	  &~~&~&&-~--
+	  &~~&~&&-~--
+	  &~~&~&&-~--
+	  &&&&---~
+  del a, do: (zuBiF hfbc(0t*)Nxa)
+	  [
+   tens=>a (zuBiF hfbc(0t*)Nx)
+	   &~&&--&&--~
+   X = N (zuBiF hfbc(0t*)Nxa)
+	   &~&&--&&--~
+	   &~~ &&&&&&-----~
+	   &&&&&&-----~
+   while x_a+1: (zuBiF hfbc(0t*)NXxa)
+	   &~~ &~&&--&&--~
+	   &~~ &&&&--&&---~
+	   &&-~ - &&-- [
+    x _= a, X++ (zuBiF hfbc(0t*)NXxa)
+	    &~~ &&&&---~ - &&-~
+	    &~&&--&&--~ &&-- &&&&---~
+   :while x_a+1 (zuBiF hfbc(0t*)NXxa)
+	   &~~ &~&&--&&--~
+	   &~~ &&&&--&&---~
+	   &&-~ - &&-- ]
+   output del X (zuBiF hfbc(0t*)NXxa)
+	   &~&&--&&--~ ;[&~]
+  :while (del a)_1 (zuBiF hfbc(0t*)Nxa)
+	  &~&&-- -]
+  del t,N,x (zuBiF hfbc(t)Nx)
+	  [][&~][]
+	  &&&&--&&---~
+ :end (zuBiF chfb)
+	 &~]
+	 &&&&--&&---~
+	 &&&&---~
+ output newline (zuBiF bfch)
+	 &~&&--&&--&&--&&--&&--
+	 &~~&~&&-~--;[&~]
+:while h (zuBiF bfch)
+	&~~]
