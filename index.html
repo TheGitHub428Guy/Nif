@@ -17,14 +17,14 @@
 			div{color:white}
 			#a11>*{height:100%}
 			#e{background-color: 0a75; border-color: 2a2abc;}
-			#r{background-color: 053b; border-color: 151565; white-space: pre-wrap; overflow: auto}
+			#r{background-color: 053b; border-color: 151565; white-space: pre-wrap; word-break: break-word; overflow: auto}
 			#s{background-color:#333; height:100%}
 			#a1{height: calc(100% - 120px)}
 			/*help?*/
 			#a2{background-color:#555; height:120px; bottom:0; width:100%; font-size:0 /*remove space between buttons*/;position:relative}
 			#b{background-color:#222}
 			.gutter {background-color: #000; z-index: 2}
-			#o,#s{white-space: pre-wrap; overflow: auto}
+			#o,#s{white-space: pre-wrap; overflow: auto; word-break: break-word}
 			#loading{position:fixed;width:100%;height:100%;background-color:black;z-index:60;font-size:60px;padding:20%}
 			#all{height:100%}
 			/*help? anyone help*/
@@ -32,7 +32,7 @@
 			#speed{width:100%; margin:0}
 			#speedText{font-size:20px}
 			#a2r>*{font-size:16px}
-			#a2r>input[type="checkbox"i]{margin-right:10px}
+			#a2r>input[type="checkbox"i],#a2r>select{margin-right:10px}
 			#a2r>input[type="number"i]{font-size:initial}
 			markb{background-color:#00f}
 			#a2r{display:inline; right:0;position:absolute}
@@ -46,6 +46,19 @@
 			low {text-decoration: underline}
 			negative {background-color: red}
 			x20 {color: #bbbbbb}
+			
+			/*cool scrollbars*/
+			::-webkit-scrollbar {
+				width: 10px;
+			}
+			::-webkit-scrollbar-thumb {
+				background-color: #424242;
+				border-radius: 5px;
+			}
+			::-webkit-scrollbar-track {
+				box-shadow: inset 0 0 0 6px #2c2c2c;
+				border-radius: 5px;
+			}
 		</style>
 		<script>
 			//shorthand variables
@@ -171,10 +184,25 @@
 				}
 			}
 			$(function(){
-				//console.log("loaded");
-				playing = 0;
-				//0 = stopped, 1 = playing, -1 = paused
+				playing = 0; //0 = stopped, 1 = playing, -1 = paused
 				nif = U;
+				sVertical = T;
+				updateDebug = ()=>{
+					if(nif!=U){
+						$("#s").html(
+								$("#s").text("Steps: " + stackBase(nif.steps)).html()
+								+$("#s").text((nif.d)?` (Jumping ${(nif.d>0)?"for":"back"}wards [${Math.abs(nif.d)}])`:"").html() //oh dear
+								+sV[$("#stackView").val()]([...nif.s].reverse())
+						);
+					}
+				};
+				sV = { //stack views
+				pre: l=>(`\nStack (${stackBase(l)}):`),
+				num: s=>($("#s").text(`${sV.pre(s.length)} ${s.map(stackBase).join(" ")}`).html()),
+				str: s=>(`${sV.pre(s.length)} `+s.map(stack2String).join``),
+				vrt: s=>(`${sV.pre(s.length)}`+s.map(h=>(`\n${stackBase(h)} (${stack2String(h)})`)).join``), //i should probably clean this up a bit
+				non: s=>"",
+				};
 				stack2String = (a)=>(
 					(a<0)?
 						(`<negative>${stack2String(-a)}<\/negative>`)
@@ -182,11 +210,22 @@
 						(`<low>${"0123456789ABCDEF⁰¹²³⁴⁵⁶⁷⁸⁹abcdef"[Number(a)]}<\/low>`)
 					:(a==0x20)?
 						("<x20>∙</x20>")
+					:(a<0x7f)?
+						$("#s").text(String.fromCharCode(Number(a))).html()
+					:(a<0xa1)?
+						(`<x20>${$("#s").text(String.fromCharCode(Number(a-0x40n))).html()}<\/x20>`)
+					:(a==0xad)?
+						("<x20>-</x20>")
+					:(a==0x2de)?
+						("˞ ")
+					:(a<0x300)?
+						$("#s").text(String.fromCharCode(Number(a))).html()
 					:(a<0x10000)?
 						$("#s").text(String.fromCharCode(Number(a))).html()
 					:
 						"􏿾"
 				)
+				stackBase = x=>x.toString(sBase = $("#stackBase").val()).replace(/[\d.a-f]+/g, a=>({16: "0x", 10: "", 6: "0s"}[sBase])+a);
 				step = ()=>{
 					keepGoing=1;
 					if (nif==U) {
@@ -225,14 +264,7 @@
 						+ ["</markb>","</mark>"][+(!nif.d)]
 						+ $("#r").text($("#e").val().substr(nif.p+1)).html() //this feels unnecessary...
 					);
-					$("#s").html(
-						$("#s").text("Steps: " + nif.steps).html()
-						+$("#s").text((nif.d)?` (Jumping ${(nif.d>0)?"for":"back"}wards [${Math.abs(nif.d)}])`:"").html() //oh dear
-						+$("#s").text(`\nStack (${nif.s.length}): `).html()
-						+(($("#stringToggle").is(":checked"))?
-							[...nif.s].reverse().map(stack2String).join("")
-							:($("#s").text(`${[...nif.s].reverse().join(" ")}`).html())) //ok but why
-					);
+					updateDebug();
 					$("#r").show();
 					$("#e").hide();
 					return(keepGoing);
@@ -273,10 +305,27 @@
 					nif = U;
 					playing = 0;
 				});
-				Split(["#a","#b"], {gutterSize: 5});
-				Split(["#a11","#s"], {gutterSize: 5, direction:"vertical", minSize:10, snapOffset:10, sizes:[80,20]});
-				Split(["#o","#i"], {gutterSize: 5, direction:"vertical", minSize:10, snapOffset:10, sizes:[80,20]});
+				mainSplit = Split(["#a","#b"], {gutterSize: 5});
+				a1Split = Split(["#s","#a11"], {gutterSize: 5, direction:"horizontal", minSize:10, snapOffset:10, sizes:[20,80]});
+				bSplit = Split(["#o","#i"], {gutterSize: 5, direction:"vertical", minSize:10, snapOffset:10, sizes:[80,20]});
 				$("#speed").on("input", ()=>{$("#speedText").text(`Delay: ${$("#speed").val()}ms`)}) //oooooh
+				$("#stackView").on("change", ()=>{
+					if(($("#stackView").val() == "vrt")!=sVertical){
+						sVertical = ($("#stackView").val() == "vrt");
+						a1Split.destroy();
+						$("#a1").css("flex-direction",["column","row"][+sVertical]);
+						$("#s")[["before","after"][+sVertical]]($("#a11"));
+						a1Split = Split(["#a11","#s"][["valueOf","reverse"][+sVertical]](), {
+							gutterSize: 5,
+							direction:["vertical","horizontal"][+sVertical],
+							minSize:10,
+							snapOffset:10,
+							sizes:[80,20][["valueOf","reverse"][+sVertical]]() //calm down
+						});
+					}
+					updateDebug()
+				})
+				$("#stackBase").on("change", updateDebug)
 				$("#loading").hide()
 			});
 		</script>
@@ -285,7 +334,8 @@
 		<div id="loading">loading lol</div>
 		<div id="all" style="display:flex">
 		<div id="a">
-			<div id="a1">
+			<div id="a1" style="display:flex">
+				<!-- program state --><div id="s">Debug info goes here...</div>
 				<div id="a11">
 					<!-- code being edited --><textarea id="e">
 &
@@ -299,7 +349,6 @@
 &&-~&]</textarea>
 					<!-- code being run --><div id="r" style="display:none"></div>
 				</div>
-				<!-- program state --><div id="s">Debug info goes here...</div>
 			</div>
 			<div id="a2">
 				<div id="a2b">
@@ -311,8 +360,19 @@
 					<button id="stop" disabled>Stop</button>
 				</div>
 				<div id="a2r">
-					<label for="st">Show stack as string:</label>
-					<input type="checkbox" id="stringToggle" name="st">
+					<label for="sv">Stack view:</label>
+					<select id="stackView" name="sv">
+						<option value="vrt">Vertical</option>
+						<option value="num">Numbers</option>
+						<option value="str">String</option>
+						<option value="non">None</option>
+					</select>
+					<label for="sb">Base:</label>
+					<select id="stackBase" name="sb">
+						<option value=10>Decimal</option>
+						<option value=16>Hex</option>
+						<option value=6>Seximal</option> <!--don't laugh-->
+					</select>
 					<br>
 					<label for="jt">Show jumps:</label>
 					<input type="checkbox" id="jumpToggle" name="jt">
