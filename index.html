@@ -120,11 +120,11 @@
 								this.steps++;
 								break;
 							case"[":
-								if(this.s.$()<1n){this.d++};
+								if((this.s.$()??0)<1n){this.d++};
 								this.steps++;
 								break;
 							case"]":
-								if(this.s.$()>0n){this.d--};
+								if((this.s.$()??0)>0n){this.d--};
 								this.steps++;
 								break;
 						}
