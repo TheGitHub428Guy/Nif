@@ -1,0 +1,5 @@
+&&-; &~~ //get 1 char of input and duplicate it
+&~ &~&-&-&-&-&-&- &~~&~&&-~-- - //make the number 48
+- //subtract that from the input character. if the input char > 48 this will be greater than 0
+[&~~;[&~]&] //if the result of that was greater than 0, print the input char in an infinite loop
+; //otherwise just print once

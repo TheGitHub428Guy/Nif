@@ -1,0 +1,57 @@
+html {overflow: hidden}
+body {background-color: 0; margin:0}
+*{font-family: monospace}
+textarea {
+	color: white;
+	background-color: #222;
+	border-color: #444;
+	resize: none;
+	width:100%
+}
+div{color:white}
+#a11>*{height:100%}
+#e{background-color: 0a75; border-color: 2a2abc;}
+#r{background-color: 053b; border-color: 151565; white-space: pre-wrap; word-break: break-word; overflow: auto}
+#s{background-color:#333; height:100%; word-break:break-all}
+#a1{height: calc(100% - 140px)}
+/*hello?*/
+#a2{background-color:#555; height:140px; bottom:0; width:100%; font-size:0 /*remove space between buttons*/;position:relative}
+#b{background-color:#222}
+.gutter {background-color: #000; z-index: 2}
+#o,#s{white-space: pre-wrap; overflow: auto; word-break: break-word}
+#loading{position:fixed;width:100%;height:100%;background-color:black;z-index:60;font-size:60px;padding:20%}
+#all{height:100%}
+/*anyone here? what's going on*/
+#a2b>button{width:33%; height:60px; font-size:40px}
+#speed{width:100%; margin:0}
+#a2b>label{font-size:15px}
+#speedText{font-size:20px !important}
+#a2r>*{font-size:16px}
+#a2r>input[type="checkbox"i],#a2r>select{margin-right:10px}
+#a2r>input[type="number"i]{font-size:initial}
+markb{background-color:#08f}
+markc{background-color:#f00}
+#a2r{display:inline; right:0;position:absolute}
+#a2b{
+	bottom: 0px;
+	position: absolute;
+	width: 100%;
+}
+
+/*when showing stack as string*/
+low {text-decoration: underline}
+negative {background-color: red}
+x20 {color: #bbbbbb}
+
+/*cool scrollbars*/
+::-webkit-scrollbar {
+	width: 10px;
+}
+::-webkit-scrollbar-thumb {
+	background-color: #888;
+	border-radius: 5px;
+}
+::-webkit-scrollbar-track {
+	box-shadow: inset 0 0 0 6px #555;
+	border-radius: 5px;
+}
