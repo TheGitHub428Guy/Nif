@@ -34,7 +34,8 @@ Multi I/O is a method used to combine multiple methods of I/O.
 |any n != 0|Send n to the selected I/O method.|whatever that method returns
 |0, then any n != 0|Change selected I/O method to the one with ID n.|0, then 0 if the method exists, -1 if it doesn't
 |0, then 0|Send 0 to the selected I/O method.|0, then whatever that method returns
-Using undefined I/O methods does nothing and returns 0 lol
+
+Using undefined I/O methods does nothing and returns 0 lol\
 Here is a list of the I/O methods used in the HTML interpreter's multi I/O:
 ##### 1 - Terminal I/O
 Similar to the Text I/O example, but with the ability to get keypresses too.
@@ -44,8 +45,9 @@ any n ≥ 0|Output n as a Unicode character.|0
 -1|Read 1 character from stdin (line-buffered).|that character's code point
 -2|Try to read 1 character* from the keypress queue (non-blocking).|that character's code point, or -1 if keypress queue is empty
 any n ≤ -3|Nothing|0
+
 *Some keypresses are counted as multiple characters, e.g. `\x1b[C` for the right arrow key. I might fix this later idk
 ### Examples
-Here's what the (currently) shortest Hello, world! program in Nif (262 characters) looks like:
-```&&-&-&-&-&-&-&-&-&-&--&~~&&--&~~&~~&~&&-~-&&-~--&~~&~~&&--&&--&&--&~~&~&&-~--&~~;&~~-~&&&&---~&~&&-~--&&--&~~&-;&~~-~&&--&&--&~~;&~~-~;&~~-~&&--&&--&&--&~~;&~~-&&--&&--&&--~&-&-&-&-&-&&--&&--&~~;[&~]&-&-;&~~-~&~~&~&--;[&~];[&~]&&--&&--&&--;[&~];[&~]&-&-&[;[&~]&]```
+Here's what the (currently) shortest Hello, world! program in Nif (262 characters) looks like:\
+```&&-&-&-&-&-&-&-&-&-&--&~~&&--&~~&~~&~&&-~-&&-~--&~~&~~&&--&&--&&--&~~&~&&-~--&~~;&~~-~&&&&---~&~&&-~--&&--&~~&-;&~~-~&&--&&--&~~;&~~-~;&~~-~&&--&&--&&--&~~;&~~-&&--&&--&&--~&-&-&-&-&-&&--&&--&~~;[&~]&-&-;&~~-~&~~&~&--;[&~];[&~]&&--&&--&&--;[&~];[&~]&-&-&[;[&~]&]```\
 Other examples can be found in the `examples` folder.
