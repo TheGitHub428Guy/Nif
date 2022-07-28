@@ -177,10 +177,16 @@ class TermIO {
 			this.K.length ? this.K.shift().codePointAt(0) : -1
 		):(N==-1)?(
 			this.L=true,
-			!this.I.length ? (this.I.push(...await this.RL.read([
-				this.T.selectLines(this.T.buffer.active.cursorY, this.T.buffer.active.cursorY),
+			!this.I.length ? (
+				//y=this.T.buffer.active.cursorY+this.T.buffer.active.baseY, //why not
+				this.I.push(...await this.RL.read([
+				await new Promise((resolve,reject)=>requestAnimationFrame(resolve)),
+				await new Promise((resolve,reject)=>requestAnimationFrame(resolve)), //good lord why Twice
+				this.T.selectLines(this.T.buffer.active.cursorY+this.T.buffer.active.baseY, this.T.buffer.active.cursorY+this.T.buffer.active.baseY), //stop
 				this.T.getSelection(),
-				this.T.select(this.T.buffer.active.cursorX, this.T.buffer.active.cursorY, 0)][1]), "\n")) : 0,
+				this.T.select(this.T.buffer.active.cursorX, this.T.buffer.active.cursorY+this.T.buffer.active.baseY, 0)][3] //STOP
+				), "\n")
+			) : 0,
 			this.L=false,
 			this.I.length ? this.I.shift().codePointAt(0) : -1
 		):(
